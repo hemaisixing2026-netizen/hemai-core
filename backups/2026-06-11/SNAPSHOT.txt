@@ -1,0 +1,4 @@
+快照时间: Thu Jun 11 03:00:55 CST 2026
+G盘: /mnt/g/openclaw-workspace
+Hermes配置: /root/.hermes/config.yaml
+文件数: 66

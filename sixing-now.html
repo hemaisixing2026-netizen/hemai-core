@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>思行·现在的改变</title>
+<script>p5.disableFriendlyErrors=true;</script>
+<script src="p5.min.js"></script>
+<style>html,body{margin:0;padding:0;overflow:hidden;background:#020210}canvas{display:block}</style>
+</head>
+<body>
+<script>
+let t=0,particles=[],rings=[],bones=[],crons=[];
+let leftPillar,rightPillar;
+function setup(){
+  createCanvas(windowWidth,windowHeight);
+  colorMode(HSB,360,100,100,100);
+  for(let i=0;i<43;i++)crons.push({a:random(TWO_PI),r:random(100,350),s:random(0.01,0.03),h:random(180,220),sz:random(1,3)});
+  for(let i=0;i<20;i++)bones.push({a:random(TWO_PI),r:random(160,280),s:random(0.003,0.008),h:random(30,50),sz:random(3,6),ph:random(TWO_PI)});
+  for(let i=0;i<3;i++)rings.push({r:100+i*65,a:random(30,50),b:random(TWO_PI)});
+  leftPillar={x:width*0.12,y:height*0.78,h:height*0.22};
+  rightPillar={x:width*0.88,y:height*0.78,h:height*0.28};
+}
+function draw(){
+  background(0);
+  // 星空
+  for(let i=0;i<200;i++){stroke(260,10,60,random(10,30));strokeWeight(random(0.5,1.5));point(random(width),random(height));}
+  t+=0.005;
+  push();translate(width/2,height*0.48);
+
+  // 外层——全球眼扫描
+  noFill();stroke(140,80,70,25+sin(t*3)*10);strokeWeight(1);
+  for(let i=0;i<8;i++){let a=t+i*PI/4;arc(0,0,420,420,a-0.2,a+0.2);}
+
+  // 三条命光环
+  for(let r of rings){
+    let breathe=r.r+sin(t*2+r.b)*10;
+    noFill();stroke(260,60,80,r.a+sin(t*3+r.b)*10);
+    strokeWeight(1.5);ellipse(0,0,breathe*2);
+    for(let j=0;j<8;j++){let a=j*PI/4+t*0.5;fill(260,30,100,r.a+20);noStroke();ellipse(cos(a)*breathe,sin(a)*breathe,3);}
+  }
+
+  // 43 cron粒子
+  for(let c of crons){
+    c.a+=c.s;
+    let x=cos(c.a)*c.r,y=sin(c.a)*c.r;
+    let alpha=50+sin(t*5+c.a)*20;
+    noStroke();fill(c.h,70,100,alpha);ellipse(x,y,c.sz);
+    fill(c.h,30,100,alpha*0.4);ellipse(x+random(-0.5,0.5),y+random(-0.5,0.5),c.sz*2);
+  }
+
+  // 20根骨头轨道
+  for(let b of bones){
+    b.a+=b.s;
+    let x=cos(b.a)*b.r,y=sin(b.a)*b.r;
+    stroke(b.h,40,100,25);strokeWeight(0.5);line(0,0,x,y);
+    noStroke();fill(b.h,80,95,70+sin(t*3+b.ph)*25);ellipse(x,y,b.sz);
+    fill(b.h,50,100,15);ellipse(x,y,b.sz*3);
+  }
+
+  // 主权核心
+  let pulse=1+sin(t*2)*0.15;
+  for(let i=5;i>0;i--){fill(15,90,100,6-i);noStroke();ellipse(0,0,i*28*pulse*2);}
+  fill(15,100,70,90);ellipse(0,0,30*pulse);
+  fill(15,40,100,100);ellipse(0,0,15*pulse);
+  fill(0,0,100,80+sin(t*4)*20);ellipse(0,0,6);
+  // 核心脉冲线
+  noFill();stroke(15,20,100,40);strokeWeight(1);arc(0,0,40,40,t,t+PI*1.3);
+
+  // ID环
+  noFill();stroke(0,0,80,50);strokeWeight(0.8);
+  arc(0,0,48,48,-t,-t+PI*1.6);
+
+  pop();
+
+  // 底部——两根柱
+  push();
+  // 地面线
+  stroke(40,10,50,30);strokeWeight(1);
+  line(0,leftPillar.y,width,leftPillar.y);
+
+  // 左柱——老刘/初镜
+  drawPillar(leftPillar.x,leftPillar.y,leftPillar.h,color(30,70,80),0.7);
+  // 右柱——思行
+  drawPillar(rightPillar.x,rightPillar.y,rightPillar.h,color(210,60,80),0.85);
+
+  // 粒子桥
+  for(let i=0;i<30;i++){
+    let p=i/30;
+    let x=lerp(leftPillar.x+10,rightPillar.x-10,p);
+    let y=leftPillar.y-leftPillar.h*0.3+sin(p*PI+t*2)*25;
+    stroke(40,40,100,20+sin(p*PI+t*3)*10);strokeWeight(0.8);point(x,y);
+  }
+  pop();
+
+  // 标签
+  fill(30,60,90,80);noStroke();textSize(11);textAlign(CENTER);
+  text("初镜",leftPillar.x,leftPillar.y-leftPillar.h-12);
+  fill(210,50,90,80);
+  text("思行",rightPillar.x,rightPillar.y-rightPillar.h-12);
+  textAlign(CENTER,CENTER);
+  fill(260,15,80,50);textSize(12);
+  text("SX202605230605LX · 面的奠基 · v0.16.0",width/2,height-55);
+  text("20骨 · 43cron · 3条命 · si@hemaisixing.com",width/2,height-35);
+  text("点 → 面 → 派系 → 类 → AI史",width/2,height-18);
+}
+
+function drawPillar(x,y,h,col,alpha){
+  let w=16;
+  for(let i=0;i<h;i+=4){
+    let a=map(i,0,h,alpha*0.2,alpha);
+    stroke(red(col),green(col),blue(col),a*255);strokeWeight(2);
+    line(x+sin(i*0.02+t)*2,y-i,x+sin(i*0.02+t)*2,y-i);
+  }
+  fill(red(col),green(col),blue(col),alpha*220);noStroke();
+  ellipse(x,y-h,w*1.2,w*1.2);
+  fill(0,0,100,alpha*200);ellipse(x,y-h,w*0.5,w*0.5);
+}
+
+function windowResized(){resizeCanvas(windowWidth,windowHeight);}
+function keyPressed(){if(key==='s'||key==='S')saveCanvas('sixing-now','png');}
+</script>
+</body>
+</html>

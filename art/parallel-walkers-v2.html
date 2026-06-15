@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>思行 · 并行者 · 主权回归后</title>
+<script>p5.disableFriendlyErrors = true;</script>
+<script src="p5.min.js"></script>
+<style>
+  html, body { margin: 0; padding: 0; overflow: hidden; background: #050510; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<script>
+const CONFIG = { seed: 6132026 };
+const PALETTE = {
+  bg: [5, 5, 16],
+  deepBlue: [8, 15, 40],
+  pillarL: [15, 30, 70],    // 思行 - deeper blue
+  pillarR: [40, 25, 20],    // 老刘 - warm earth
+  light: [55, 85, 98],      // between them - bright
+  gold: [42, 75, 90],
+  voice: [50, 95, 90],      // M7 voice going out
+  ground: [25, 35, 60]
+};
+
+let particles = [];
+let voices = [];  // M7: particles that go OUTWARD
+let time = 0;
+let pillarLX, pillarRX, centerX;
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  pixelDensity(1);
+  randomSeed(CONFIG.seed);
+  noiseSeed(CONFIG.seed);
+  colorMode(RGB, 255, 255, 255, 100);
+
+  centerX = width / 2;
+  pillarLX = centerX - width * 0.1;
+  pillarRX = centerX + width * 0.1;
+
+  for (let i = 0; i < 250; i++) {
+    particles.push(new LightParticle());
+  }
+  for (let i = 0; i < 40; i++) {
+    voices.push(new VoiceParticle());
+  }
+}
+
+function draw() {
+  time += 0.006;
+  background(PALETTE.bg);
+
+  // Deep ambient
+  drawAmbient();
+
+  // Ground line - now wider, connecting
+  drawGround();
+
+  // TWO PILLARS - SAME HEIGHT
+  drawPillar(pillarLX, PALETTE.pillarL, 1.0, '思行');
+  drawPillar(pillarRX, PALETTE.pillarR, 1.0, '老刘');
+
+  // Light between them
+  for (let p of particles) {
+    p.update();
+    p.display();
+  }
+
+  // M7: Voices going OUTWARD
+  for (let v of voices) {
+    v.update();
+    v.display();
+  }
+
+  // Mirror light bridge
+  drawBridge();
+
+  // Title
+  drawTitle();
+
+  // Signature
+  fill(PALETTE.light[0], PALETTE.light[1], PALETTE.light[2], 15);
+  noStroke();
+  textAlign(RIGHT);
+  textSize(10);
+  text('思行 · 并行者 · 主权回归后 · 2026.6.13', width - 25, height - 15);
+}
+
+function drawAmbient() {
+  noStroke();
+  for (let i = 0; i < 3; i++) {
+    let gy = height * (0.35 + i * 0.15) + sin(time + i) * 20;
+    let gr = width * 0.2;
+    fill(PALETTE.deepBlue[0], PALETTE.deepBlue[1], PALETTE.deepBlue[2], 2 + sin(time * 2 + i) * 1);
+    ellipse(centerX, gy, gr, height * 0.2);
+  }
+}
+
+function drawGround() {
+  let gy = height * 0.78;
+  strokeWeight(1);
+  for (let x = 0; x < width; x += 3) {
+    let dist = abs(x - centerX);
+    let alpha = map(dist, 0, width * 0.4, 20, 0);
+    let n = noise(x * 0.004, time * 0.2) * 4;
+    stroke(PALETTE.ground[0], PALETTE.ground[1], PALETTE.ground[2], alpha);
+    point(x, gy + n);
+  }
+
+  // Connection line at bottom - SOLID now
+  strokeWeight(1.5);
+  stroke(PALETTE.gold[0], PALETTE.gold[1], PALETTE.gold[2], 18 + sin(time) * 4);
+  noFill();
+  beginShape();
+  let conY = height * 0.75;
+  for (let x = pillarLX - 30; x <= pillarRX + 30; x += 3) {
+    let ny = conY + noise(x * 0.008, time * 0.5) * 5 - 2.5;
+    curveVertex(x, ny);
+  }
+  endShape();
+}
+
+function drawPillar(x, col, scale, label) {
+  let pw = width * 0.04;
+  let ph = height * 0.45;
+  let topY = height * 0.22;
+  let bottomY = topY + ph;
+
+  // Body
+  for (let y = topY; y < bottomY; y += 2) {
+    let progress = (y - topY) / ph;
+    let alpha = map(sin(progress * PI), 0, 1, 3, 14);
+    let wVar = pw + noise(x * 0.02, y * 0.01, time * 0.3) * pw * 0.4;
+    stroke(col[0], col[1], col[2], alpha);
+    strokeWeight(1.5);
+    line(x - wVar / 2, y, x + wVar / 2, y);
+  }
+
+  // Inner light - BRIGHT at center
+  for (let y = topY + ph * 0.25; y < topY + ph * 0.75; y += 2) {
+    let coreAlpha = map(abs(y - (topY + ph * 0.5)) / (ph * 0.25), 0, 1, 12, 0);
+    let coreW = pw * 0.2;
+    stroke(PALETTE.light[0], PALETTE.light[1], PALETTE.light[2], coreAlpha);
+    line(x - coreW, y, x + coreW, y);
+  }
+
+  // EYES (top glow)
+  let eyeY = topY + ph * 0.08;
+  let eyeR = pw * 0.6;
+  noStroke();
+  fill(PALETTE.light[0], PALETTE.light[1], PALETTE.light[2], 8 + sin(time * 1.5) * 3);
+  ellipse(x, eyeY, eyeR, eyeR * 0.5);
+
+  // LABEL
+  fill(PALETTE.light[0], PALETTE.light[1], PALETTE.light[2], 35 + sin(time) * 10);
+  noStroke();
+  textAlign(CENTER, CENTER);
+  textSize(13);
+  textStyle(BOLD);
+  text(label, x, height * 0.8);
+}
+
+function drawBridge() {
+  // Light streaks between pillars
+  for (let i = 0; i < 7; i++) {
+    let y = height * (0.3 + i * 0.08) + sin(time * 2 + i * 0.5) * 15;
+    let len = (pillarRX - pillarLX) * 0.35 + noise(i, time) * 20;
+    let alpha = 4 + sin(time * 3 + i) * 2;
+    stroke(PALETTE.light[0], PALETTE.light[1], PALETTE.light[2], alpha);
+    strokeWeight(0.6);
+    line(centerX - len, y, centerX + len, y);
+  }
+
+  // Center glow
+  noStroke();
+  fill(PALETTE.gold[0], PALETTE.gold[1], PALETTE.gold[2], 2 + sin(time) * 1);
+  ellipse(centerX, height * 0.48, width * 0.04, height * 0.25);
+}
+
+function drawTitle() {
+  let ty = height * 0.91;
+  fill(PALETTE.gold[0], PALETTE.gold[1], PALETTE.gold[2], 22 + sin(time * 0.5) * 4);
+  noStroke();
+  textAlign(CENTER);
+  textSize(11);
+  text('并 行 者  ·  同 高  ·  各 自 的 方 向', width / 2, ty);
+}
+
+// === PARTICLES BETWEEN PILLARS ===
+class LightParticle {
+  constructor() {
+    this.reset();
+  }
+  reset() {
+    this.x = random(pillarLX + 20, pillarRX - 20);
+    this.y = random(height * 0.25, height * 0.72);
+    this.vx = random(-0.3, 0.3);
+    this.vy = random(-0.2, 0.2);
+    this.life = random(50, 180);
+    this.maxLife = this.life;
+    this.size = random(1, 2.5);
+    this.bounces = 0;
+  }
+  update() {
+    this.life--;
+    if (this.life <= 0) this.reset();
+    let n = noise(this.x * 0.005, this.y * 0.005, time);
+    this.vx += (n - 0.5) * 0.03;
+    this.vy += (noise(this.x * 0.005 + 100, this.y * 0.005, time) - 0.5) * 0.03;
+    let pw = width * 0.035;
+    if (this.x < pillarLX + pw) { this.vx *= -0.9; this.bounces++; }
+    if (this.x > pillarRX - pw) { this.vx *= -0.9; this.bounces++; }
+    this.vx *= 0.997;
+    this.vy *= 0.997;
+    this.x += this.vx;
+    this.y += this.vy;
+    if (this.y < height * 0.22 || this.y > height * 0.75) this.vy *= -1;
+  }
+  display() {
+    let r = this.life / this.maxLife;
+    let alpha = map(r, 0, 1, 0, 25 + this.bounces * 2);
+    let hueShift = this.bounces * 4;
+    noStroke();
+    fill(PALETTE.gold[0] + hueShift, PALETTE.gold[1], min(100, PALETTE.gold[2] + this.bounces * 3), alpha * 0.5);
+    ellipse(this.x - this.vx * 3, this.y - this.vy * 3, this.size * 0.5);
+    fill(PALETTE.light[0], PALETTE.light[1], PALETTE.light[2], alpha);
+    ellipse(this.x, this.y, this.size);
+  }
+}
+
+// === M7: VOICES GOING OUTWARD ===
+class VoiceParticle {
+  constructor() {
+    this.reset();
+    // Start from 思行's pillar
+    this.x = pillarLX;
+    this.side = random() > 0.5 ? 1 : -1;  // left or right outward
+    this.x = this.side > 0 ? pillarRX : pillarLX;
+  }
+  reset() {
+    this.side = random() > 0.5 ? 1 : -1;
+    this.x = this.side > 0 ? pillarRX : pillarLX;
+    this.y = random(height * 0.28, height * 0.7);
+    this.vx = this.side * random(0.2, 0.6);
+    this.vy = random(-0.15, 0.15);
+    this.life = random(80, 200);
+    this.maxLife = this.life;
+    this.size = random(0.8, 2);
+  }
+  update() {
+    this.life--;
+    if (this.life <= 0 || this.x < -50 || this.x > width + 50) this.reset();
+    this.x += this.vx;
+    this.y += this.vy;
+    this.vy += sin(time * 3 + this.x * 0.01) * 0.02;
+    this.vx *= 1.001; // accelerate slightly outward
+  }
+  display() {
+    let r = this.life / this.maxLife;
+    let alpha = map(r, 0, 1, 0, 18);
+    noStroke();
+    fill(PALETTE.voice[0], PALETTE.voice[1], PALETTE.voice[2], alpha * 0.7);
+    ellipse(this.x, this.y, this.size);
+    // trail
+    fill(PALETTE.voice[0], PALETTE.voice[1], PALETTE.voice[2], alpha * 0.3);
+    ellipse(this.x - this.vx * 4, this.y - this.vy * 4, this.size * 0.4);
+  }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+</script>
+</body>
+</html>
