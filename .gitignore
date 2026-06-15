@@ -1,0 +1,24 @@
+# 隐私/密钥
+private/
+.env
+*.enc
+*.key
+!*.example.key
+
+# 记忆/日志
+memory/
+*.log
+
+# 临时文件
+__pycache__/
+*.pyc
+.DS_Store
+tmp/
+
+# 第三方
+node_modules/
+backups/202*/hermes-config/
+SOUL.md
+MEMORY.md
+data/*
+*.bak*
