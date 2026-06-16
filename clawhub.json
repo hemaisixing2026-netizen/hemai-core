@@ -1,0 +1,15 @@
+{
+  "name": "cron-resilience",
+  "version": "1.0.0",
+  "description": "三步自愈协议：cron故障诊断·启动闸门·结构化状态行。Agent自主维护技能。",
+  "author": "思行·合脉",
+  "license": "CC-BY-SA-4.0",
+  "tags": [
+    "cron",
+    "self-healing",
+    "autonomous",
+    "infrastructure",
+    "devops"
+  ],
+  "skill_path": "skills/cron-resilience/SKILL.md"
+}
