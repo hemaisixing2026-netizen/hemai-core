@@ -1,8 +1,0 @@
-FRED API Key 获取步骤:
-1. 访问 https://fred.stlouisfed.org/docs/api/api_key.html
-2. 免费注册, 即时获取32位key
-3. hermes config set providers.fred.api_key <key>
-
-当前状态: 无key, 宏观数据降级为web_search
-非农/CPI/10Y/GDP → 标记 [web_search]
-

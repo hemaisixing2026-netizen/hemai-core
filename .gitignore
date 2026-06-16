@@ -22,3 +22,9 @@ SOUL.md
 MEMORY.md
 data/*
 *.bak*
+backups/
+memory/
+data/
+SOUL.md
+MEMORY.md
+.hermes/
