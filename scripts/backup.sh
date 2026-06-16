@@ -66,3 +66,6 @@ find "$WORKSPACE/backups" -maxdepth 1 -type d -name "20*" | sort | head -n -$RET
 done
 
 echo "=== 完成 ==="
+
+# 私人仓库全量快照（不公开）
+bash /root/workspace/scripts/backup-to-private.sh 2>&1 | tee -a /root/workspace/backups/backup.log

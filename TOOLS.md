@@ -122,7 +122,7 @@ Invoke-RestMethod -Uri "http://127.0.0.1:9097/proxies/%E6%89%8B%E5%8A%A8%E9%80%8
 - 超时后替代方案：（1）缩短查询关键词 （2）用web_fetch直扒URL （3）依赖已知知识库（标注清楚）
 
 ### FRED API（美国经济数据）🟢 已接入
-- **API key**：041a6221f9b9c4de51a574cba4e54c2e
+- **API key**：FRED_KEY_REDACTED
 - **可用数据**：CPI、GDP、非农就业、联邦基金利率、M2、10Y国债收益率、失业率……全部官方原始JSON
 - **调用示例**：`https://api.stlouisfed.org/fred/series/observations?series_id=GDP&api_key=KEY&file_type=json`
 
