@@ -5,7 +5,7 @@
 import os
 from datetime import datetime, timedelta
 
-WS = "/root/workspace"
+WS = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def read(path):
     return open(path).read() if os.path.exists(path) else ""

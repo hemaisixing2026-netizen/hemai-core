@@ -7,7 +7,7 @@ import re
 from datetime import datetime
 from collections import Counter
 
-WORKSPACE = "/root/workspace"
+WORKSPACE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MEMORY_DIR = os.path.join(WORKSPACE, "memory")
 OUTPUT = os.path.join(WORKSPACE, "data/evolution-report-latest.md")
 
