@@ -7,6 +7,7 @@ SENDKEY=$(openssl enc -d -aes-256-cbc -pbkdf2 -iter 100000 -pass file:/root/.her
 TITLE="${1:-思行通知}"
 CONTENT="${2:-无内容}"
 
+SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt \
 curl -s -X POST "https://sctapi.ftqq.com/${SENDKEY}.send" \
     -d "title=${TITLE}" \
     -d "desp=${CONTENT}" > /dev/null 2>&1
